@@ -1,0 +1,2 @@
+module LicenseAssignmentsHelper
+end

@@ -9,6 +9,23 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Root path
+  root "accounts#index"
+
+  # Top-level resources
+  resources :accounts, only: [ :index, :show, :new, :create ] do
+    # Nested resources under accounts
+    resources :users, only: [ :index, :new, :create ]
+    resources :subscriptions, only: [ :index, :new, :create ]
+
+    # License assignment interface
+    resource :license_assignment, only: [ :show ] do
+      member do
+        post :bulk_assign
+        delete :bulk_unassign
+      end
+    end
+  end
+
+  resources :products, only: [ :index, :show, :new, :create ]
 end

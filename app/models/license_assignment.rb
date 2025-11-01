@@ -8,6 +8,31 @@ class LicenseAssignment < ApplicationRecord
   validate :user_belongs_to_account
   validate :subscription_exists_and_has_available_licenses
 
+  def self.bulk_assign(account:, user_ids:, product_ids:)
+    errors = []
+    success_count = 0
+
+    product_ids.each do |product_id|
+      user_ids.each do |user_id|
+        assignment = new(
+          account: account,
+          user_id: user_id,
+          product_id: product_id
+        )
+
+        if assignment.save
+          success_count += 1
+        else
+          user = User.find_by(id: user_id)
+          product = Product.find_by(id: product_id)
+          errors << "#{user&.name} - #{product&.name}: #{assignment.errors.full_messages.join(', ')}"
+        end
+      end
+    end
+
+    { success_count: success_count, errors: errors }
+  end
+
   private
 
   def user_belongs_to_account

@@ -3,13 +3,13 @@
 one:
   account: one
   product: one
-  number_of_licenses: 1
-  issued_at: 2025-11-01 08:57:37
-  expires_at: 2025-11-01 08:57:37
+  number_of_licenses: 10
+  issued_at: <%= 1.day.ago %>
+  expires_at: <%= 1.year.from_now %>
 
 two:
   account: two
   product: two
-  number_of_licenses: 1
-  issued_at: 2025-11-01 08:57:37
-  expires_at: 2025-11-01 08:57:37
+  number_of_licenses: 5
+  issued_at: <%= 1.day.ago %>
+  expires_at: <%= 1.year.from_now %>
