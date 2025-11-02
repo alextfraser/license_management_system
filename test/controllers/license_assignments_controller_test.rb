@@ -28,12 +28,9 @@ class LicenseAssignmentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should bulk unassign licenses" do
-    # First create an assignment
-    assignment = LicenseAssignment.create!(
-      account: @account,
-      user: @user,
-      product: @product
-    )
+    # Fixture already has an assignment for user one and product one
+    # Verify it exists
+    assert LicenseAssignment.exists?(account: @account, user: @user, product: @product)
 
     assert_difference("LicenseAssignment.count", -1) do
       delete bulk_unassign_account_license_assignment_url(@account), params: {
@@ -47,13 +44,8 @@ class LicenseAssignmentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "bulk assign with validation errors returns alert" do
-    # Try to assign duplicate
-    LicenseAssignment.create!(
-      account: @account,
-      user: @user,
-      product: @product
-    )
-
+    # Fixture already has an assignment for user one and product one
+    # Try to assign duplicate (should fail)
     post bulk_assign_account_license_assignment_url(@account), params: {
       user_ids: [ @user.id ],
       product_ids: [ @product.id ]
