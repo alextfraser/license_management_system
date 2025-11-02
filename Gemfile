@@ -59,6 +59,11 @@ group :development do
 
   # Ruby LSP for IDE support
   gem "ruby-lsp"
+
+  # Performance profiling with query analysis and N+1 detection
+  gem "rack-mini-profiler"
+  gem "memory_profiler"
+  gem "stackprof"
 end
 
 group :test do
