@@ -1,4 +1,32 @@
-<div>
-  <h1 class="font-bold text-4xl">Products#index</h1>
-  <p>Find me in app/views/products/index.html.erb</p>
+<div class="max-w-4xl">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Products</h1>
+    <%= link_to "New Product", new_product_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
+    <% @products.each do |product| %>
+      <div class="p-6 hover:bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <h2 class="text-xl font-semibold text-gray-900"><%= product.name %></h2>
+            <% if product.description.present? %>
+              <p class="text-gray-600 mt-1"><%= product.description %></p>
+            <% end %>
+            <p class="text-sm text-gray-500 mt-2">
+              <%= pluralize(product.subscriptions.count, 'subscription') %>
+            </p>
+          </div>
+          <%= link_to "View", product_path(product), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @products.empty? %>
+      <div class="p-12 text-center text-gray-500">
+        <p class="text-lg">No products yet</p>
+        <p class="text-sm mt-2">Create your first product to get started</p>
+      </div>
+    <% end %>
+  </div>
 </div>

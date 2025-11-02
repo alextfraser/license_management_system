@@ -1,4 +1,36 @@
-<div>
-  <h1 class="font-bold text-4xl">Users#index</h1>
-  <p>Find me in app/views/users/index.html.erb</p>
+<div class="max-w-4xl">
+  <div class="mb-6">
+    <%= link_to "← Back to #{@account.name}", account_path(@account), class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Users</h1>
+      <p class="text-gray-600 mt-1"><%= @account.name %></p>
+    </div>
+    <%= link_to "Add User", new_account_user_path(@account), class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
+    <% @users.each do |user| %>
+      <div class="p-6 hover:bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900"><%= user.name %></h2>
+            <p class="text-gray-600"><%= user.email %></p>
+            <p class="text-sm text-gray-500 mt-1">
+              <%= pluralize(user.license_assignments.count, 'license') %> assigned
+            </p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @users.empty? %>
+      <div class="p-12 text-center text-gray-500">
+        <p class="text-lg">No users yet</p>
+        <p class="text-sm mt-2">Add your first user to this account</p>
+      </div>
+    <% end %>
+  </div>
 </div>

@@ -1,4 +1,25 @@
-<div>
-  <h1 class="font-bold text-4xl">Products#show</h1>
-  <p>Find me in app/views/products/show.html.erb</p>
+<div class="max-w-4xl">
+  <div class="mb-6">
+    <%= link_to "← Back to Products", products_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4"><%= @product.name %></h1>
+    
+    <% if @product.description.present? %>
+      <p class="text-gray-700 text-lg mb-6"><%= @product.description %></p>
+    <% end %>
+
+    <div class="grid grid-cols-2 gap-6 mt-8">
+      <div class="bg-blue-50 rounded-lg p-6">
+        <div class="text-3xl font-bold text-blue-600"><%= @product.subscriptions.count %></div>
+        <div class="text-sm text-gray-600 mt-1">Total Subscriptions</div>
+      </div>
+
+      <div class="bg-green-50 rounded-lg p-6">
+        <div class="text-3xl font-bold text-green-600"><%= @product.license_assignments.count %></div>
+        <div class="text-sm text-gray-600 mt-1">Licenses Assigned</div>
+      </div>
+    </div>
+  </div>
 </div>

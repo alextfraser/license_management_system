@@ -1,4 +1,55 @@
-<div>
-  <h1 class="font-bold text-4xl">Subscriptions#index</h1>
-  <p>Find me in app/views/subscriptions/index.html.erb</p>
+<div class="max-w-4xl">
+  <div class="mb-6">
+    <%= link_to "← Back to #{@account.name}", account_path(@account), class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Subscriptions</h1>
+      <p class="text-gray-600 mt-1"><%= @account.name %></p>
+    </div>
+    <%= link_to "Add Subscription", new_account_subscription_path(@account), class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
+    <% @subscriptions.each do |subscription| %>
+      <div class="p-6 hover:bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <h2 class="text-lg font-semibold text-gray-900"><%= subscription.product.name %></h2>
+            <div class="mt-2 space-y-1">
+              <p class="text-sm text-gray-600">
+                <span class="font-medium"><%= subscription.used_licenses %></span> of 
+                <span class="font-medium"><%= subscription.number_of_licenses %></span> licenses used
+              </p>
+              <p class="text-sm text-gray-600">
+                Issued: <%= subscription.issued_at.strftime("%B %d, %Y") %>
+              </p>
+              <p class="text-sm text-gray-600">
+                Expires: <%= subscription.expires_at.strftime("%B %d, %Y") %>
+              </p>
+            </div>
+          </div>
+          <div class="text-right">
+            <% if subscription.expired? %>
+              <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">Expired</span>
+            <% else %>
+              <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">Active</span>
+            <% end %>
+            <div class="text-2xl font-bold text-blue-600 mt-2">
+              <%= subscription.available_licenses %>
+            </div>
+            <div class="text-xs text-gray-500">available</div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @subscriptions.empty? %>
+      <div class="p-12 text-center text-gray-500">
+        <p class="text-lg">No subscriptions yet</p>
+        <p class="text-sm mt-2">Add your first subscription to this account</p>
+      </div>
+    <% end %>
+  </div>
 </div>
