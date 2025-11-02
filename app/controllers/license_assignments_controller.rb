@@ -6,7 +6,6 @@ class LicenseAssignmentsController < ApplicationController
     @subscriptions = @account.subscriptions.includes(:product).active
     @license_assignments = @account.license_assignments.includes(:user, :product)
 
-    # Build a hash for quick lookup of assignments
     @assignments_by_user_and_product = @license_assignments.each_with_object({}) do |assignment, hash|
       hash[[ assignment.user_id, assignment.product_id ]] = assignment
     end
@@ -20,9 +19,18 @@ class LicenseAssignmentsController < ApplicationController
     )
 
     if result[:errors].empty?
-      redirect_to account_license_assignment_path(@account), notice: "Successfully assigned #{result[:success_count]} license(s)."
+      redirect_to account_license_assignment_path(@account),
+                  notice: "#{result[:success_count]} assigned successfully"
     else
-      redirect_to account_license_assignment_path(@account), alert: "Assigned #{result[:success_count]} license(s) with errors: #{result[:errors].join('; ')}"
+      displayed_errors = result[:errors].first(5)
+      remaining = result[:failed_count] - displayed_errors.size
+
+      message = "#{result[:success_count]} assigned, #{result[:failed_count]} failed. First #{displayed_errors.size} errors:\n" +
+                displayed_errors.map { |error| "• #{error}" }.join("\n")
+
+      message += "\n... and #{remaining} more errors" if remaining > 0
+
+      redirect_to account_license_assignment_path(@account), alert: message
     end
   end
 
@@ -36,7 +44,8 @@ class LicenseAssignmentsController < ApplicationController
     count = assignments.count
     assignments.destroy_all
 
-    redirect_to account_license_assignment_path(@account), notice: "Successfully unassigned #{count} license(s)."
+    redirect_to account_license_assignment_path(@account),
+                notice: "#{count} unassigned successfully"
   end
 
   private

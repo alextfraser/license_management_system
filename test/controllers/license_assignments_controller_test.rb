@@ -24,7 +24,7 @@ class LicenseAssignmentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to account_license_assignment_url(@account)
-    assert_match(/Successfully assigned/, flash[:notice])
+    assert_match(/assigned successfully/, flash[:notice])
   end
 
   test "should bulk unassign licenses" do
@@ -40,7 +40,7 @@ class LicenseAssignmentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to account_license_assignment_url(@account)
-    assert_match(/Successfully unassigned/, flash[:notice])
+    assert_match(/unassigned successfully/, flash[:notice])
   end
 
   test "bulk assign with validation errors returns alert" do

@@ -8,6 +8,8 @@ class LicenseAssignment < ApplicationRecord
   validate :user_belongs_to_account
   validate :subscription_exists_and_has_available_licenses
 
+  # Bulk assignment allows partial success for better UX.
+  # Uses pessimistic locking to prevent race conditions.
   def self.bulk_assign(account:, user_ids:, product_ids:)
     errors = []
     success_count = 0
@@ -26,13 +28,21 @@ class LicenseAssignment < ApplicationRecord
           else
             user = User.find_by(id: user_id)
             product = Product.find_by(id: product_id)
-            errors << "#{user&.name} - #{product&.name}: #{assignment.errors.full_messages.join(', ')}"
+            error_msg = assignment.errors.full_messages.first || "Unknown error"
+            errors << "#{user&.name} already has #{product&.name}" if error_msg.include?("already has")
+            errors << "No licenses available for #{product&.name}" if error_msg.include?("No available")
+            errors << "#{product&.name} subscription expired" if error_msg.include?("expired")
+            errors << error_msg unless error_msg.include?("already has") || error_msg.include?("No available") || error_msg.include?("expired")
           end
         end
       end
     end
 
-    { success_count: success_count, errors: errors }
+    {
+      success_count: success_count,
+      failed_count: errors.size,
+      errors: errors
+    }
   end
 
   private
@@ -48,7 +58,6 @@ class LicenseAssignment < ApplicationRecord
   def subscription_exists_and_has_available_licenses
     return if account.blank? || product.blank?
 
-    # Use pessimistic locking to prevent race conditions when checking license availability
     subscription = Subscription.lock.find_by(account: account, product: product)
 
     if subscription.blank?

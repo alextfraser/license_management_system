@@ -224,7 +224,7 @@ class LicenseAssignmentTest < ActiveSupport::TestCase
 
     assert_equal 0, result[:success_count]
     assert_not_empty result[:errors]
-    assert_match(/already has a license/, result[:errors].first)
+    assert_match(/already has/, result[:errors].first)
   end
 
   test "bulk_assign with no available licenses returns errors" do
@@ -248,7 +248,7 @@ class LicenseAssignmentTest < ActiveSupport::TestCase
 
     assert_equal 0, result[:success_count]
     assert_not_empty result[:errors]
-    assert_match(/No available licenses/, result[:errors].first)
+    assert_match(/No licenses available/, result[:errors].first)
   end
 
   test "bulk_assign partially succeeds when some assignments fail" do
