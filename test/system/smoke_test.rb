@@ -7,8 +7,10 @@ class SmokeTest < ApplicationSystemTestCase
     # Create test data for navigation
     account = Account.create!(name: "Smoke Test Account")
     product = Product.create!(name: "Test Product", description: "For testing")
-    user = account.users.create!(name: "Test User", email: "smoke@test.com")
-    subscription = account.subscriptions.create!(
+
+    # Create user and subscription (just need them to exist for views to display data)
+    account.users.create!(name: "Test User", email: "smoke@test.com")
+    account.subscriptions.create!(
       product: product,
       number_of_licenses: 5,
       issued_at: Time.current,
@@ -31,7 +33,7 @@ class SmokeTest < ApplicationSystemTestCase
     click_on "New Account"
     assert_selector "h1", text: "New Account"
     assert_field "Name"
-    assert_button "Create Account"  # This is a real button (form submit)
+    assert_button "Create Account"
 
     # Verify account detail page
     visit account_path(account)
