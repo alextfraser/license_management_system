@@ -3,7 +3,9 @@ class LicenseAssignmentsController < ApplicationController
 
   def show
     @users = @account.users
-    @subscriptions = @account.subscriptions.includes(:product).active
+    @subscriptions = @account.subscriptions
+      .includes(:product)
+      .where("issued_at <= ? AND expires_at > ?", Time.current, Time.current)
     @license_assignments = @account.license_assignments.includes(:user, :product)
 
     @assignments_by_user_and_product = @license_assignments.each_with_object({}) do |assignment, hash|

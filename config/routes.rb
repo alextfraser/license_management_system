@@ -20,10 +20,8 @@ Rails.application.routes.draw do
 
     # License assignment interface
     resource :license_assignment, only: [ :show ] do
-      member do
-        post :bulk_assign
-        delete :bulk_unassign
-      end
+      post :bulk_assign
+      delete :bulk_unassign
     end
   end
 

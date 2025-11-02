@@ -3,9 +3,8 @@ class LicenseAssignment < ApplicationRecord
   belongs_to :user
   belongs_to :product
 
-  validates :user_id, uniqueness: { scope: [ :account_id, :product_id ],
-                                     message: "already has a license for this product" }
   validate :user_belongs_to_account
+  validate :no_duplicate_active_assignment
   validate :subscription_exists_and_has_available_licenses
 
   # Bulk assignment allows partial success for better UX.
@@ -31,8 +30,8 @@ class LicenseAssignment < ApplicationRecord
             error_msg = assignment.errors.full_messages.first || "Unknown error"
             errors << "#{user&.name} already has #{product&.name}" if error_msg.include?("already has")
             errors << "No licenses available for #{product&.name}" if error_msg.include?("No available")
-            errors << "#{product&.name} subscription expired" if error_msg.include?("expired")
-            errors << error_msg unless error_msg.include?("already has") || error_msg.include?("No available") || error_msg.include?("expired")
+            errors << "No active subscription for #{product&.name}" if error_msg.include?("No active subscription")
+            errors << error_msg unless error_msg.include?("already has") || error_msg.include?("No available") || error_msg.include?("No active subscription")
           end
         end
       end
@@ -55,26 +54,43 @@ class LicenseAssignment < ApplicationRecord
     end
   end
 
+  def no_duplicate_active_assignment
+    return if user.blank? || account.blank? || product.blank?
+
+    active_subscription = Subscription.active.find_by(account: account, product: product)
+    return unless active_subscription
+
+    existing_active = LicenseAssignment.where(
+      account: account,
+      user: user,
+      product: product
+    ).where("created_at >= ?", active_subscription.issued_at)
+
+    existing_active = existing_active.where.not(id: id) if persisted?
+
+    if existing_active.exists?
+      errors.add(:user_id, "already has a license for this product")
+    end
+  end
+
   def subscription_exists_and_has_available_licenses
     return if account.blank? || product.blank?
 
-    subscription = Subscription.lock.find_by(account: account, product: product)
+    subscription = Subscription.active.lock.find_by(account: account, product: product)
 
     if subscription.blank?
-      errors.add(:base, "No subscription exists for this product")
+      errors.add(:base, "No active subscription exists for this product")
       return
     end
 
-    if subscription.expired?
-      errors.add(:base, "Subscription has expired")
-      return
-    end
+    assignments_scope = LicenseAssignment.where(account: account, product: product)
+      .where("created_at >= ?", subscription.issued_at)
+      .lock
 
-    # When updating, don't count this assignment against the limit
     existing_assignments = if persisted?
-      LicenseAssignment.where(account: account, product: product).where.not(id: id).lock.count
+      assignments_scope.where.not(id: id).count
     else
-      LicenseAssignment.where(account: account, product: product).lock.count
+      assignments_scope.count
     end
 
     if existing_assignments >= subscription.number_of_licenses

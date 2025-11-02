@@ -84,19 +84,29 @@ account1.subscriptions.create!(
   expires_at: 11.months.from_now
 )
 
-# Account 2 (Acme Corp): Fully used + expired subscription
+# Account 2 (Acme Corp): Renewal scenario - expired + renewed subscription
+# OLD expired subscription for vLex Colombia
 account2.subscriptions.create!(
-  product: products[3], # Microsoft Office - will be fully used
-  number_of_licenses: 3,
-  issued_at: 2.months.ago,
-  expires_at: 10.months.from_now
-)
-
-account2.subscriptions.create!(
-  product: products[0], # vLex Colombia - expired
+  product: products[0], # vLex Colombia - EXPIRED (old subscription)
   number_of_licenses: 5,
   issued_at: 2.years.ago,
   expires_at: 1.year.ago  # EXPIRED
+)
+
+# NEW active subscription for vLex Colombia (renewal)
+account2.subscriptions.create!(
+  product: products[0], # vLex Colombia - ACTIVE (renewed)
+  number_of_licenses: 3,
+  issued_at: 1.month.ago,
+  expires_at: 11.months.from_now
+)
+
+# Microsoft Office - will be fully used
+account2.subscriptions.create!(
+  product: products[3], # Microsoft Office
+  number_of_licenses: 3,
+  issued_at: 2.months.ago,
+  expires_at: 10.months.from_now
 )
 
 # Account 3 (Tech Industries): Mix of scenarios
@@ -132,9 +142,10 @@ account1_users.each do |user|
   LicenseAssignment.create!(account: account1, user: user, product: products[1]) # vLex Costa Rica
 end
 
-# Account 2: Fully used (3/3) for Microsoft Office
+# Account 2: All users assigned to vLex Colombia (renewed subscription) and Microsoft Office
 account2_users.each do |user|
-  LicenseAssignment.create!(account: account2, user: user, product: products[3]) # Microsoft Office
+  LicenseAssignment.create!(account: account2, user: user, product: products[0]) # vLex Colombia (3/3 - fully used)
+  LicenseAssignment.create!(account: account2, user: user, product: products[3]) # Microsoft Office (3/3 - fully used)
 end
 
 # Account 3: Partially used (4/10) for Office, Fully used (7/7) for Adobe
@@ -156,7 +167,7 @@ puts "License Assignments: #{LicenseAssignment.count}"
 puts "----------------------------------------"
 puts "\n📊 Testing Scenarios:"
 puts "  1️⃣  Best Law Firm    - Some licenses available (5/10 used)"
-puts "  2️⃣  Acme Corp        - Fully used (3/3) + expired subscription"
+puts "  2️⃣  Acme Corp        - RENEWAL: Expired + renewed vLex Colombia (3/3 used on new)"
 puts "  3️⃣  Tech Industries  - Mixed: partial (4/10) and full (7/7) usage + expired"
 puts "  4️⃣  Startup Inc      - No subscriptions yet (empty state)"
 puts "----------------------------------------"
