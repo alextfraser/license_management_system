@@ -77,7 +77,7 @@ class LicenseAssignmentTest < ActiveSupport::TestCase
       expires_at: 1.year.from_now
     )
 
-    assignment1 = LicenseAssignment.create!(
+    LicenseAssignment.create!(
       account: @account,
       user: @user,
       product: @product
@@ -319,7 +319,7 @@ class LicenseAssignmentTest < ActiveSupport::TestCase
     # Now we can REASSIGN the SAME users to the new subscription!
     # This is allowed because old subscription is expired (inactive)
     new_assignment1 = LicenseAssignment.create!(account: @account, user: user1, product: @product)
-    new_assignment2 = LicenseAssignment.create!(account: @account, user: user2, product: @product)
+    LicenseAssignment.create!(account: @account, user: user2, product: @product)
 
     # New subscription now has 2 used, 1 available
     assert_equal 2, new_subscription.reload.used_licenses
@@ -413,7 +413,7 @@ class LicenseAssignmentTest < ActiveSupport::TestCase
     @subscription.destroy!
 
     # Create expired subscription
-    expired_sub = Subscription.create!(
+    Subscription.create!(
       account: @account,
       product: @product,
       number_of_licenses: 10,
