@@ -57,13 +57,32 @@ The application will be available at `http://localhost:3000`
 
 ## Testing
 
-```bash
-# Run all tests
-bin/rails test
+This application emphasizes testing where it provides the most value:
 
-# Run system tests
+**Model Tests**: Comprehensive coverage of validations, associations, business logic, and edge cases  
+**Controller Tests**: HTTP behavior, CRUD operations, and error handling  
+**Smoke Test**: Single system test to verify the application loads and navigation works  
+**Manual Verification**: UI/UX testing with seed data for the best confidence in user experience
+
+System tests are intentionally minimal (one smoke test), as they tend to be brittle and provide less value than targeted unit tests combined with human verification.
+
+```bash
+# Run all tests (22 unit/integration tests + 1 smoke test)
+bin/rails test
 bin/rails test:system
+
+# Seed data for manual testing
+bin/rails db:seed
 ```
+
+### Test Coverage
+
+- ✅ Account model: validations, associations, dependent destroy
+- ✅ User model: validations (name, email uniqueness, format), associations
+- ✅ Product model: validations, associations
+- ✅ Subscription model: validations, business logic (expired?, available_licenses), scopes
+- ✅ LicenseAssignment model: complex validations, bulk operations
+- ✅ All controllers: CRUD operations, error handling, redirects
 
 ## Code Quality
 
