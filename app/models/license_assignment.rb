@@ -14,18 +14,20 @@ class LicenseAssignment < ApplicationRecord
 
     product_ids.each do |product_id|
       user_ids.each do |user_id|
-        assignment = new(
-          account: account,
-          user_id: user_id,
-          product_id: product_id
-        )
+        ActiveRecord::Base.transaction do
+          assignment = new(
+            account: account,
+            user_id: user_id,
+            product_id: product_id
+          )
 
-        if assignment.save
-          success_count += 1
-        else
-          user = User.find_by(id: user_id)
-          product = Product.find_by(id: product_id)
-          errors << "#{user&.name} - #{product&.name}: #{assignment.errors.full_messages.join(', ')}"
+          if assignment.save
+            success_count += 1
+          else
+            user = User.find_by(id: user_id)
+            product = Product.find_by(id: product_id)
+            errors << "#{user&.name} - #{product&.name}: #{assignment.errors.full_messages.join(', ')}"
+          end
         end
       end
     end
@@ -46,7 +48,8 @@ class LicenseAssignment < ApplicationRecord
   def subscription_exists_and_has_available_licenses
     return if account.blank? || product.blank?
 
-    subscription = Subscription.find_by(account: account, product: product)
+    # Use pessimistic locking to prevent race conditions when checking license availability
+    subscription = Subscription.lock.find_by(account: account, product: product)
 
     if subscription.blank?
       errors.add(:base, "No subscription exists for this product")
@@ -60,9 +63,9 @@ class LicenseAssignment < ApplicationRecord
 
     # When updating, don't count this assignment against the limit
     existing_assignments = if persisted?
-      LicenseAssignment.where(account: account, product: product).where.not(id: id).count
+      LicenseAssignment.where(account: account, product: product).where.not(id: id).lock.count
     else
-      LicenseAssignment.where(account: account, product: product).count
+      LicenseAssignment.where(account: account, product: product).lock.count
     end
 
     if existing_assignments >= subscription.number_of_licenses
