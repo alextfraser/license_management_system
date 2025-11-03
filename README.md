@@ -28,9 +28,7 @@ This is my solution to building the vLex License Management System. The applicat
 ### Architecture
 
 - Skinny controllers with business logic in models
-- Concerns for shared behavior when needed
-- Direct JSON rendering without serializers
-- Tailwind CSS for rapid UI development
+- Tailwind CSS + Hotwire for responsive server-rendered UI
 
 ## Prerequisites
 
@@ -67,12 +65,9 @@ This application emphasizes testing where it provides the most value:
 System tests are intentionally minimal (one smoke test), as they tend to be brittle and provide less value than targeted unit tests combined with human verification.
 
 ```bash
-# Run all tests (22 unit/integration tests + 1 smoke test)
+# Run all tests
 bin/rails test
-bin/rails test:system
 
-# Seed data for manual testing
-bin/rails db:seed
 ```
 
 ### Test Coverage
