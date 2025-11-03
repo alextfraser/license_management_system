@@ -11,7 +11,10 @@
         <!-- Left: Product Licenses -->
         <div>
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-900">Product Licenses</h2>
+            <div>
+              <h2 class="text-xl font-bold text-gray-900">Product Licenses</h2>
+              <p class="text-sm text-gray-500">Showing active subscriptions only</p>
+            </div>
             <% if @subscriptions.any? %>
               <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
                 <input type="checkbox" 

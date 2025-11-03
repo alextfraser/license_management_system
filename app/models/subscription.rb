@@ -1,7 +1,6 @@
 class Subscription < ApplicationRecord
   belongs_to :account
   belongs_to :product
-  has_many :license_assignments, foreign_key: [ :account_id, :product_id ], primary_key: [ :account_id, :product_id ]
 
   validates :number_of_licenses, presence: true, numericality: { greater_than: 0, only_integer: true }
   validates :issued_at, presence: true
